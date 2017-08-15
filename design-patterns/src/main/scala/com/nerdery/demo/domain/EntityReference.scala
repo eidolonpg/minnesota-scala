@@ -1,4 +1,4 @@
-package com.nerdery.demo
+package com.nerdery.demo.domain
 
 class EntityReference[+T](val entityId: Long, val entity: Option[T])
 

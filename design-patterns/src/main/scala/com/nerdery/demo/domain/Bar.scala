@@ -1,4 +1,4 @@
-package com.nerdery.demo
+package com.nerdery.demo.domain
 
 case class Bar(id: Long,
                name: String,

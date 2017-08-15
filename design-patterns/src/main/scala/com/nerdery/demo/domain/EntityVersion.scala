@@ -1,4 +1,4 @@
-package com.nerdery.demo
+package com.nerdery.demo.domain
 
 import java.time.OffsetDateTime
 

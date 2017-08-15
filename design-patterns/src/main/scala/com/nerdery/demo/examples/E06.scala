@@ -1,20 +1,26 @@
-package com.nerdery.demo
+package com.nerdery.demo.examples
 
-import com.nerdery.demo.Foos.FooActions
+import com.nerdery.demo.domain.{Bar, EntityReference, Foo}
+import com.nerdery.demo.error.FooError
 import monix.eval.Task
 
-case class Foo(id: Long, name: String, values: Seq[Bar.Value])
-
-object Foo {
-  def barIds(foo: Foo): Seq[Long] = foo.values.map(_.bar.entityId)
-
-  def barReferences(foo: Foo): Seq[EntityReference[Bar]] = foo.values.map(_.bar)
-
-  implicit object FooEq extends cats.Eq[Foo] {
-    override def eqv(x: Foo, y: Foo): Boolean = x.id == y.id
+object E06 {
+  trait CanValidate[T, Error] {
+    def validate(t: T): Task[Either[Error, CanValidate.Valid]]
   }
 
-  implicit object FooCanValidateCreate extends CanValidate[(Foo, Seq[EntityReference[Bar]]), FooError, FooActions.Create] {
+  object CanValidate {
+    sealed trait Valid
+    case object Valid extends Valid
+  }
+
+  object Validation {
+    def validate[T, Error](t: T)(implicit ev: CanValidate[T, Error]): Task[Either[Error, CanValidate.Valid]] = {
+      ev.validate(t)
+    }
+  }
+
+  implicit object FooCanValidate extends CanValidate[(Foo, Seq[EntityReference[Bar]]), FooError] {
     override def validate(t: (Foo, Seq[EntityReference[Bar]])): Task[Either[FooError, CanValidate.Valid]] = {
       val (foo, bars) = t
       val errors = for {
@@ -32,5 +38,4 @@ object Foo {
 
     def validateValues(foo: Foo, bars: Seq[EntityReference[Bar]]): Task[Seq[FooError]] = ???
   }
-
 }
